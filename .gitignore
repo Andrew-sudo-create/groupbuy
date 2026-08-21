@@ -2,3 +2,6 @@
 
 # Design handoff bundle — not part of the deployed app
 GroupBuy B2B wireframe spec-handoff/
+
+.vercel
+.env*
