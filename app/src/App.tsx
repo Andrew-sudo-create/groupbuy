@@ -3,6 +3,7 @@ import { AppLayout } from "./components/AppLayout";
 import { RequireAuth, RequireRole, RequireAnyRole } from "./components/RouteGuards";
 import LoginPage from "./routes/LoginPage";
 import AuthCallbackPage from "./routes/AuthCallbackPage";
+import QuickJoinPage from "./routes/QuickJoinPage";
 import OnboardingBuyerPage from "./routes/OnboardingBuyerPage";
 import OnboardingSupplierPage from "./routes/OnboardingSupplierPage";
 import BuyerDashboardPage from "./routes/BuyerDashboardPage";
@@ -21,6 +22,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/join/:code" element={<QuickJoinPage />} />
 
         <Route
           path="/onboarding/buyer"

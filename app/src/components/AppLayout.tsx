@@ -5,7 +5,7 @@ import { useAuth } from "../lib/AuthContext";
 export function AppLayout() {
   const { loading } = useAuth();
   const { pathname } = useLocation();
-  const showSidebar = pathname !== "/login";
+  const showSidebar = pathname !== "/login" && !pathname.startsWith("/join/");
 
   if (loading) {
     return (
