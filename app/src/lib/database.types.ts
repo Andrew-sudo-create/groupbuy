@@ -49,6 +49,21 @@ export type Database = {
           },
         ]
       }
+      demo_guest_pool: {
+        Row: {
+          claimed_at: string | null
+          code: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          code: string
+        }
+        Update: {
+          claimed_at?: string | null
+          code?: string
+        }
+        Relationships: []
+      }
       item_tiers: {
         Row: {
           id: string
@@ -303,6 +318,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_next_demo_guest: { Args: never; Returns: string }
       is_pool_admin: { Args: { p_pool_id: string }; Returns: boolean }
       is_supplier_active_in_pool: {
         Args: { p_pool_id: string }
