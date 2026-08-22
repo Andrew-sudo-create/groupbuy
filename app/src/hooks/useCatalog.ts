@@ -34,6 +34,10 @@ export function usePoolCatalog(poolId: string | null | undefined) {
       return (items ?? []).map((it) => computeItemVM(it, it.item_tiers, totals.get(it.id) ?? 0));
     },
     enabled: !!poolId,
+    // Short poll so a live-presentation audience sees pledges/tier-fills from
+    // OTHER buyers land without anyone needing to manually refresh — this is
+    // the buyer dashboard, the screen most likely to be watched live.
+    refetchInterval: 4000,
   });
 }
 
@@ -69,6 +73,9 @@ export function useSupplierItemsInPool(supplierId: string | null | undefined, po
       return (items ?? []).map((it) => computeItemVM(it, it.item_tiers, totals.get(it.id) ?? 0));
     },
     enabled: !!supplierId && !!poolId,
+    // Same live-poll as usePoolCatalog — this is the supplier's projector view
+    // during a presentation.
+    refetchInterval: 4000,
   });
 }
 

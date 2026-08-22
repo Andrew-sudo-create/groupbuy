@@ -41,6 +41,9 @@ export function useOrderSummary(poolId: string | null | undefined, supplierId: s
       return computeSummaryStats(itemVMs, pledgesForStats);
     },
     enabled: !!poolId && !!supplierId,
+    // Live-poll like the catalog hooks so this screen (often the one on a
+    // projector during a presentation) updates on its own.
+    refetchInterval: 4000,
   });
 }
 
