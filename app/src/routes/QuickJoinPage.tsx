@@ -9,7 +9,7 @@ import { useAuth } from "../lib/AuthContext";
 // attendees can scan a QR code and land straight on a populated dashboard —
 // never reuse this pattern for real user accounts.
 const DEMO_PASSWORD = "groupbuy2026";
-const CODE_PATTERN = /^g([1-9]|1[0-5])$/; // g1–g15
+const CODE_PATTERN = /^g([1-9]|1[0-9]|2[0-5])$/; // g1–g25
 
 export default function QuickJoinPage() {
   const { code: rawCode } = useParams<{ code: string }>();
