@@ -2,12 +2,15 @@
 //
 // For each of the supplier's catalog items, looks at real pledge totals across
 // EVERY pool (via the supplier_pool_item_totals RPC, which returns aggregate
-// quantities + distinct-buyer counts only — never buyer identity, and never for
-// pools the supplier hasn't pledged-into demand for), and searches combinations
-// of not-yet-linked pools that would push the combined total over the next
+// quantities, distinct-buyer counts, and an average pairwise buyer-distance in
+// km — never buyer identity or individual positions, and never for pools the
+// supplier hasn't pledged-into demand for), and searches combinations of
+// not-yet-linked pools that would push the combined total over the next
 // supplier-defined pricing tier. It ranks combinations by the savings they'd
-// unlock, flags fragile ones (single-buyer or over-concentrated pools), and asks
-// Gemini only to narrate the already-computed numbers — never to invent them.
+// unlock, prefers geographically tighter buyer clusters when ties need
+// breaking, flags fragile ones (single-buyer, over-concentrated, or widely
+// scattered pools), and asks Gemini only to narrate the already-computed
+// numbers — never to invent them.
 //
 // This directly answers the "predict need / find compatible businesses / size
 // the combined demand / optimise the group / price it / size the saving / flag
@@ -57,6 +60,13 @@ interface Candidate {
   qty: number;
   buyerCount: number;
   linkStatus: "none" | "pending";
+  buyerSpreadKm: number | null;
+}
+
+function subsetAvgSpread(subset: Candidate[]): number | null {
+  const vals = subset.map((c) => c.buyerSpreadKm).filter((v): v is number => v != null);
+  if (vals.length === 0) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
 function* subsetsOf<T>(arr: T[], maxSize: number): Generator<T[]> {
@@ -121,7 +131,7 @@ Deno.serve(async (req) => {
       combinedQtyAfter: number;
       thresholdNeeded: number;
       savings: number;
-      pools: { poolId: string; poolName: string; deliveryLocation: string; addedQty: number; buyerCount: number; linkStatus: "none" | "pending" }[];
+      pools: { poolId: string; poolName: string; deliveryLocation: string; addedQty: number; buyerCount: number; linkStatus: "none" | "pending"; buyerSpreadKm: number | null }[];
       riskFlags: string[];
       explanationPromptFacts: string;
     };
@@ -133,7 +143,12 @@ Deno.serve(async (req) => {
       if (tiers.length === 0) continue;
 
       const itemTotals = (totalsRows ?? []).filter((t) => t.item_id === item.id);
-      const totalByPool = new Map(itemTotals.map((t) => [t.pool_id, { qty: Number(t.total_qty), buyers: Number(t.buyer_count) }]));
+      const totalByPool = new Map(
+        itemTotals.map((t) => [
+          t.pool_id,
+          { qty: Number(t.total_qty), buyers: Number(t.buyer_count), spreadKm: t.avg_buyer_distance_km != null ? Number(t.avg_buyer_distance_km) : null },
+        ]),
+      );
 
       const activeTotal = [...totalByPool.entries()]
         .filter(([poolId]) => linkStatusByPool.get(poolId) === "active")
@@ -153,6 +168,7 @@ Deno.serve(async (req) => {
             qty: v.qty,
             buyerCount: v.buyers,
             linkStatus: status === "pending" ? "pending" : "none",
+            buyerSpreadKm: v.spreadKm,
           } as Candidate;
         })
         .sort((a, b) => b.qty - a.qty)
@@ -160,19 +176,23 @@ Deno.serve(async (req) => {
 
       if (candidates.length === 0) continue;
 
-      let best: { subset: Candidate[]; combinedTotal: number; newTierIdx: number } | null = null;
+      let best: { subset: Candidate[]; combinedTotal: number; newTierIdx: number; spread: number | null } | null = null;
       for (const subset of subsetsOf(candidates, Math.min(4, candidates.length))) {
         const added = subset.reduce((s, c) => s + c.qty, 0);
         const combinedTotal = activeTotal + added;
         const result = tierFor(tiers, combinedTotal);
         if (result.idx <= current.idx) continue; // must actually cross into a better tier
+        const spread = subsetAvgSpread(subset);
         const better =
           !best ||
           result.idx > best.newTierIdx ||
           (result.idx === best.newTierIdx &&
             (subset.length < best.subset.length ||
-              (subset.length === best.subset.length && combinedTotal < best.combinedTotal)));
-        if (better) best = { subset, combinedTotal, newTierIdx: result.idx };
+              (subset.length === best.subset.length &&
+                (combinedTotal < best.combinedTotal ||
+                  (combinedTotal === best.combinedTotal &&
+                    spread != null && best.spread != null && spread < best.spread)))));
+        if (better) best = { subset, combinedTotal, newTierIdx: result.idx, spread };
       }
 
       if (!best) continue;
@@ -198,10 +218,16 @@ Deno.serve(async (req) => {
       if (best.combinedTotal - maxContribution < achievedThreshold) {
         riskFlags.push("Dropping the single largest contributing pool would fall back below this tier's threshold.");
       }
+      const scattered = best.subset.filter((c) => c.buyerSpreadKm != null && c.buyerSpreadKm > 8);
+      if (scattered.length > 0) {
+        riskFlags.push(
+          `Businesses driving demand in ${scattered.map((c) => `${c.poolName} (~${c.buyerSpreadKm!.toFixed(1)}km apart)`).join(", ")} are fairly spread out — delivery consolidation may be less efficient than a tighter cluster.`,
+        );
+      }
 
       const factLines = [
         `Item: ${item.name} (${item.unit}). Currently ${activeTotal} units linked-and-active at ${tierLabel(current.idx)} (${fmtR(currentPrice)}/unit).`,
-        `Recommended group: ${best.subset.map((c) => `${c.poolName} (${c.deliveryLocation || "location TBD"}, ${c.qty} ${item.unit} pledged across ${c.buyerCount} buyer${c.buyerCount === 1 ? "" : "s"})`).join("; ")}.`,
+        `Recommended group: ${best.subset.map((c) => `${c.poolName} (${c.deliveryLocation || "location TBD"}, ${c.qty} ${item.unit} pledged across ${c.buyerCount} buyer${c.buyerCount === 1 ? "" : "s"}${c.buyerSpreadKm != null ? `, businesses there are ~${c.buyerSpreadKm.toFixed(1)}km apart from each other` : ""})`).join("; ")}.`,
         `Adding them brings the combined total to ${best.combinedTotal} units, crossing into ${tierLabel(newTier.idx)} at ${fmtR(newPrice)}/unit — unlocking ${fmtR(savings)} in total savings versus staying at ${tierLabel(current.idx)}.`,
         riskFlags.length > 0 ? `Risk to flag: ${riskFlags.join(" ")}` : "No major concentration risk detected.",
       ].join("\n");
@@ -225,6 +251,7 @@ Deno.serve(async (req) => {
           addedQty: c.qty,
           buyerCount: c.buyerCount,
           linkStatus: c.linkStatus,
+          buyerSpreadKm: c.buyerSpreadKm,
         })),
         riskFlags,
         explanationPromptFacts: factLines,

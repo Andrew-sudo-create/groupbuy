@@ -56,6 +56,7 @@ export interface OpportunityPool {
   addedQty: number;
   buyerCount: number;
   linkStatus: "none" | "pending";
+  buyerSpreadKm: number | null;
 }
 
 export interface Opportunity {

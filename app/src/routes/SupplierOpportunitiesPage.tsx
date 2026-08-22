@@ -105,6 +105,7 @@ function OpportunityCard({
               <Users size={10} />
               {p.buyerCount}
             </span>
+            {p.buyerSpreadKm != null && <span className="text-faint">~{p.buyerSpreadKm.toFixed(1)}km apart</span>}
             {p.linkStatus === "pending" && <Tag tone="neutral">Requested</Tag>}
           </div>
         ))}

@@ -590,6 +590,7 @@ export type Database = {
       supplier_pool_item_totals: {
         Args: { p_supplier_id: string }
         Returns: {
+          avg_buyer_distance_km: number | null
           buyer_count: number
           item_id: string
           pool_id: string
