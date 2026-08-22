@@ -22,7 +22,7 @@ export function useNearbyBusinesses(myId: string | null | undefined, myLat: numb
     queryFn: async (): Promise<NearbyBusiness[]> => {
       const { data, error } = await supabase
         .from("buyer_profiles")
-        .select("id, business_name, business_type, pool_id, contact_phone, lat, lng, pools(name)")
+        .select("id, business_name, business_type, pool_id, contact_phone, lat, lng, pools!buyer_profiles_pool_id_fkey(name)")
         .neq("id", myId!)
         .not("lat", "is", null)
         .not("lng", "is", null);
