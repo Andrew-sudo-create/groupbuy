@@ -1,6 +1,6 @@
 import { corsHeaders, jsonResponse } from "./_shared/cors.ts";
 import { userClient } from "./_shared/supabaseClient.ts";
-import { completeJson, AiUnavailableError } from "./_shared/anthropic.ts";
+import { completeJson, AiUnavailableError } from "./_shared/ai.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
