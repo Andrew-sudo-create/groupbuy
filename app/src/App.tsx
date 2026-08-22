@@ -11,6 +11,7 @@ import MyPoolPage from "./routes/MyPoolPage";
 import MySummaryPage from "./routes/MySummaryPage";
 import SupplierPoolsGridPage from "./routes/SupplierPoolsGridPage";
 import SupplierPoolDetailPage from "./routes/SupplierPoolDetailPage";
+import SupplierOpportunitiesPage from "./routes/SupplierOpportunitiesPage";
 import OrderSummaryGridPage from "./routes/OrderSummaryGridPage";
 import OrderSummaryDetailPage from "./routes/OrderSummaryDetailPage";
 import SettingsPage from "./routes/SettingsPage";
@@ -99,6 +100,14 @@ export default function App() {
           element={
             <RequireRole role="supplier">
               <SupplierPoolDetailPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/supplier/opportunities"
+          element={
+            <RequireRole role="supplier">
+              <SupplierOpportunitiesPage />
             </RequireRole>
           }
         />

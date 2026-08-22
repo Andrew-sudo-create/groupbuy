@@ -9,11 +9,55 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
+      ai_recommendation_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          pool_ids: string[]
+          status: string
+          supplier_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          pool_ids: string[]
+          status: string
+          supplier_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          pool_ids?: string[]
+          status?: string
+          supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_recommendation_feedback_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_recommendation_feedback_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       buyer_profiles: {
         Row: {
           business_name: string
@@ -334,6 +378,15 @@ export type Database = {
         Args: { p_pool_id: string }
         Returns: {
           item_id: string
+          total_qty: number
+        }[]
+      }
+      supplier_pool_item_totals: {
+        Args: { p_supplier_id: string }
+        Returns: {
+          buyer_count: number
+          item_id: string
+          pool_id: string
           total_qty: number
         }[]
       }

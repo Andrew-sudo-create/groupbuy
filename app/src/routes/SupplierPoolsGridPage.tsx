@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { useAuth } from "../lib/AuthContext";
 import { useAllPools } from "../hooks/usePools";
 import { useSupplierLinks, useRequestJoinPool, useRespondToLink } from "../hooks/useSupplierLinks";
@@ -21,10 +21,19 @@ export default function SupplierPoolsGridPage() {
 
   return (
     <div className="max-w-[1280px] mx-auto px-6 pt-8 pb-14 w-full">
-      <div className="mb-6">
-        <PageKicker>Supplier portal</PageKicker>
-        <h2 className="text-[26px] font-bold m-0 tracking-tight">Area pools</h2>
-        <p className="text-muted mt-1 mb-0 text-[13px]">{supplierProfile.company_name}</p>
+      <div className="mb-6 flex justify-between items-start gap-3 flex-wrap">
+        <div>
+          <PageKicker>Supplier portal</PageKicker>
+          <h2 className="text-[26px] font-bold m-0 tracking-tight">Area pools</h2>
+          <p className="text-muted mt-1 mb-0 text-[13px]">{supplierProfile.company_name}</p>
+        </div>
+        <button
+          onClick={() => navigate("/supplier/opportunities")}
+          className="inline-flex items-center gap-1.5 whitespace-nowrap border border-border-strong rounded-full px-3.5 py-1.5 text-[13px] text-accent-light bg-transparent cursor-pointer hover:bg-surface-2 font-sans"
+        >
+          <Sparkles size={14} />
+          AI Opportunities
+        </button>
       </div>
 
       <h4 className="text-base font-semibold mb-3">My pools</h4>

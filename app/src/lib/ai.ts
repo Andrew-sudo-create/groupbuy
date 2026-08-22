@@ -48,3 +48,33 @@ export function fetchDemandProfile() {
 export function generateOrderNarrative(poolId: string, supplierId: string) {
   return invoke<{ narrative: string }>("ai-order-narrative", { poolId, supplierId });
 }
+
+export interface OpportunityPool {
+  poolId: string;
+  poolName: string;
+  deliveryLocation: string;
+  addedQty: number;
+  buyerCount: number;
+  linkStatus: "none" | "pending";
+}
+
+export interface Opportunity {
+  itemId: string;
+  itemName: string;
+  unit: string;
+  currentTierLabel: string;
+  newTierLabel: string;
+  priceBefore: string;
+  priceAfter: string;
+  combinedQtyBefore: number;
+  combinedQtyAfter: number;
+  thresholdNeeded: number;
+  savings: number;
+  pools: OpportunityPool[];
+  riskFlags: string[];
+  explanation: string;
+}
+
+export function fetchGroupOpportunities() {
+  return invoke<{ opportunities: Opportunity[] }>("ai-group-opportunities", {});
+}

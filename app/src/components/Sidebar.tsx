@@ -12,6 +12,7 @@ import {
   UserCircle,
   LogOut,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../lib/AuthContext";
 
@@ -100,9 +101,14 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
             </>
           )}
           {role === "supplier" && (
-            <NavLink to="/supplier" icon={<Warehouse size={16} />} onNavigate={onClose}>
-              Supplier Portal
-            </NavLink>
+            <>
+              <NavLink to="/supplier" icon={<Warehouse size={16} />} onNavigate={onClose}>
+                Supplier Portal
+              </NavLink>
+              <NavLink to="/supplier/opportunities" icon={<Sparkles size={16} />} onNavigate={onClose}>
+                AI Opportunities
+              </NavLink>
+            </>
           )}
           {role && (
             <NavLink to="/summary" icon={<FileText size={16} />} onNavigate={onClose}>
