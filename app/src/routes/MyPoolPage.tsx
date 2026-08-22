@@ -31,7 +31,7 @@ export default function MyPoolPage() {
       <PageKicker>My pool</PageKicker>
       <h2 className="text-[26px] font-bold m-0 mb-6 tracking-tight">{pool?.name ?? "…"}</h2>
 
-      <div className="grid grid-cols-2 gap-4 items-start mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start mb-4">
         <div className="bg-surface border border-border rounded-2xl p-5">
           <h5 className="m-0 mb-3.5 text-[15px] font-semibold">Members</h5>
           <div className="flex flex-col gap-2.5">

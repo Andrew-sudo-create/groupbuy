@@ -32,7 +32,7 @@ function SupplierSummaryGrid({ supplierId }: { supplierId: string }) {
       {myPools.length === 0 ? (
         <EmptyNote>You're not linked to any pools yet.</EmptyNote>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {myPools.map((p) => (
             <Card key={p.id} onClick={() => navigate(`/summary/${p.id}/${supplierId}`)} className="flex flex-col gap-2.5">
               <div className="flex justify-between items-start gap-2">
@@ -61,7 +61,7 @@ function BuyerSummaryGrid({ poolId }: { poolId: string | null }) {
       {!suppliers || suppliers.length === 0 ? (
         <EmptyNote>No suppliers are active in your pool yet.</EmptyNote>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {suppliers.map((s) => (
             <Card key={s.id} onClick={() => navigate(`/summary/${poolId}/${s.id}`)} className="flex flex-col gap-2.5">
               <div className="flex justify-between items-start gap-2">

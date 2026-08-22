@@ -40,7 +40,7 @@ export default function SupplierPoolDetailPage() {
         {pool?.delivery_location || "Delivery location TBD"}
       </p>
 
-      <div className="grid grid-cols-3 gap-4 mb-7">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
         <StatCard icon={<Package size={13} />} label="Total volume pledged" value={`${totalVolume} units`} />
         <StatCard icon={<Users size={13} />} label="Buyers in this pool" value={String(members?.length ?? 0)} />
         <StatCard icon={<TrendingUp size={13} />} label="Items unlocked" value={`${unlockedCount}/${items?.length ?? 0}`} />
@@ -50,7 +50,7 @@ export default function SupplierPoolDetailPage() {
         <h4 className="text-[17px] font-semibold m-0">Items</h4>
       </div>
       <p className="text-muted text-[13px] mb-3.5">Click an item to view or edit its tier pricing.</p>
-      <div className="grid grid-cols-3 gap-3.5 mb-7">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-7">
         {items?.map((item) => (
           <Card key={item.id} onClick={() => setSelectedItemId(item.id)} className="flex flex-col gap-2">
             <div className="flex justify-between items-start gap-2">

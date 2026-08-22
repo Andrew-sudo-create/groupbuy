@@ -159,8 +159,8 @@ export default function BuyerDashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-[2fr_1fr] gap-6 items-start">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {catalogLoading && <p className="text-faint text-sm col-span-2">Loading catalog…</p>}
           {catalog?.length === 0 && (
             <p className="text-faint text-sm col-span-2">
@@ -198,7 +198,7 @@ export default function BuyerDashboardPage() {
           })}
         </div>
 
-        <div className="bg-surface border border-border rounded-2xl sticky top-4 p-5">
+        <div className="bg-surface border border-border rounded-2xl lg:sticky lg:top-4 p-5">
           <h5 className="m-0 mb-3.5 text-[15px] font-semibold">My pledges</h5>
           {myPledgeRows.length > 0 ? (
             <>

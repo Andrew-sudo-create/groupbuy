@@ -116,11 +116,11 @@ export function Modal({ onClose, children, maxWidth = 440 }: { onClose: () => vo
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-overlay flex items-center justify-center p-6 z-50"
+      className="fixed inset-0 bg-overlay flex items-center justify-center p-4 sm:p-6 z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-surface-modal border border-border-strong rounded-2xl p-7 w-full"
+        className="bg-surface-modal border border-border-strong rounded-2xl p-5 sm:p-7 w-full max-h-[90vh] overflow-y-auto"
         style={{ maxWidth }}
       >
         {children}

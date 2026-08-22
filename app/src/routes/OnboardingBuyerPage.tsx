@@ -42,7 +42,7 @@ export default function OnboardingBuyerPage() {
     <div className="max-w-[1040px] mx-auto px-6 py-16 w-full">
       <PageKicker>Buyer sign-up · step 2 of 2</PageKicker>
       <h1 className="text-[30px] font-bold tracking-tight mb-7">Tell us about your business</h1>
-      <div className="grid grid-cols-[1fr_1.15fr] gap-10 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.15fr] gap-10 items-start">
         <div className="flex flex-col gap-4.5">
           <div>
             <Label>Business name</Label>

@@ -33,7 +33,7 @@ export default function MySummaryPage() {
       <h2 className="text-[26px] font-bold m-0 mb-1.5 tracking-tight">{buyerProfile.business_name}</h2>
       <p className="text-muted text-[13.5px] m-0 mb-6">{pool?.name ?? "…"} pool · your own pledges only</p>
 
-      <div className="grid grid-cols-3 gap-4 mb-7">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
         <StatCard icon={<Package size={13} />} label="Units pledged" value={String(units)} />
         <StatCard icon={<CreditCard size={13} />} label="Total spend" value={fmtR(spend)} />
         <StatCard icon={<PiggyBank size={13} />} label="Total saved" value={fmtR(savings)} />

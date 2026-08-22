@@ -31,7 +31,7 @@ export default function SupplierPoolsGridPage() {
       {myPools.length === 0 ? (
         <EmptyNote>You're not linked to any pools yet — request to join one below.</EmptyNote>
       ) : (
-        <div className="grid grid-cols-3 gap-4 mb-9">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-9">
           {myPools.map((p) => (
             <Card key={p.id} onClick={() => navigate(`/supplier/pools/${p.id}`)} className="flex flex-col gap-2.5">
               <div className="flex justify-between items-start gap-2">
@@ -48,7 +48,7 @@ export default function SupplierPoolsGridPage() {
       )}
 
       <h4 className="text-base font-semibold mb-3 mt-8">Other pools</h4>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {otherPools.map((p) => {
           const link = linkByPool.get(p.id);
           return (

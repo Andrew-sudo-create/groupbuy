@@ -42,7 +42,7 @@ export default function OrderSummaryDetailPage() {
         AI-drafted — ready to review
       </div>
 
-      <div className="bg-surface border border-border rounded-2xl p-9">
+      <div className="bg-surface border border-border rounded-2xl p-5 sm:p-9">
         <div className="text-faint text-xs uppercase tracking-wide">{pool?.name ?? "…"} pool</div>
         <h2 className="text-[26px] font-bold mt-1 mb-1.5 tracking-tight">Order Summary</h2>
         <p className="text-muted text-[13.5px] m-0 mb-1">
@@ -69,7 +69,7 @@ export default function OrderSummaryDetailPage() {
 
         <div className="border-t border-border my-6" />
 
-        <div className="grid grid-cols-3 gap-4 mb-7">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
           <StatCard dark icon={<Package size={13} />} label="Total units" value={String(stats?.totalUnits ?? 0)} />
           <StatCard dark icon={<CreditCard size={13} />} label="Total spend" value={fmtR(stats?.totalSpend ?? 0)} />
           <StatCard dark icon={<PiggyBank size={13} />} label="Total saved vs base" value={fmtR(stats?.totalSavings ?? 0)} />
