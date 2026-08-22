@@ -7,6 +7,8 @@ import QuickJoinPage from "./routes/QuickJoinPage";
 import OnboardingBuyerPage from "./routes/OnboardingBuyerPage";
 import OnboardingSupplierPage from "./routes/OnboardingSupplierPage";
 import BuyerDashboardPage from "./routes/BuyerDashboardPage";
+import MyPurchaseRequestsPage from "./routes/MyPurchaseRequestsPage";
+import BuyerOpportunitiesPage from "./routes/BuyerOpportunitiesPage";
 import MyPoolPage from "./routes/MyPoolPage";
 import MySummaryPage from "./routes/MySummaryPage";
 import SupplierPoolsGridPage from "./routes/SupplierPoolsGridPage";
@@ -51,6 +53,22 @@ export default function App() {
           element={
             <RequireRole role="buyer">
               <BuyerDashboardPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/buyer/requests"
+          element={
+            <RequireRole role="buyer">
+              <MyPurchaseRequestsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/buyer/opportunities"
+          element={
+            <RequireRole role="buyer">
+              <BuyerOpportunitiesPage />
             </RequireRole>
           }
         />

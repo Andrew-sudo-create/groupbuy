@@ -15,6 +15,9 @@ export default function AccountPage() {
   const [businessName, setBusinessName] = useState(buyerProfile?.business_name ?? "");
   const [businessType, setBusinessType] = useState<Enums<"business_type">>(buyerProfile?.business_type ?? "Café");
   const [orderNotes, setOrderNotes] = useState(buyerProfile?.order_notes ?? "");
+  const [contactPhone, setContactPhone] = useState(buyerProfile?.contact_phone ?? "");
+  const [lat, setLat] = useState<string>(buyerProfile?.lat != null ? String(buyerProfile.lat) : "");
+  const [lng, setLng] = useState<string>(buyerProfile?.lng != null ? String(buyerProfile.lng) : "");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -22,6 +25,9 @@ export default function AccountPage() {
     setBusinessName(buyerProfile.business_name);
     setBusinessType(buyerProfile.business_type);
     setOrderNotes(buyerProfile.order_notes);
+    setContactPhone(buyerProfile.contact_phone ?? "");
+    setLat(buyerProfile.lat != null ? String(buyerProfile.lat) : "");
+    setLng(buyerProfile.lng != null ? String(buyerProfile.lng) : "");
   }, [buyerProfile]);
 
   if (!buyerProfile) return null;
@@ -32,6 +38,9 @@ export default function AccountPage() {
       businessName: businessName.trim(),
       businessType,
       orderNotes,
+      contactPhone: contactPhone.trim(),
+      lat: lat.trim() ? Number(lat) : null,
+      lng: lng.trim() ? Number(lng) : null,
     });
     setSaved(true);
   }
@@ -79,6 +88,47 @@ export default function AccountPage() {
         <div>
           <Label>Neighborhood / pool</Label>
           <TextField value={pool?.name ?? ""} disabled />
+        </div>
+        <div>
+          <Label>Contact phone</Label>
+          <TextField
+            type="tel"
+            placeholder="e.g. 082 555 0134"
+            value={contactPhone}
+            onChange={(e) => {
+              setContactPhone(e.target.value);
+              setSaved(false);
+            }}
+          />
+        </div>
+        <div>
+          <Label>Business location (optional)</Label>
+          <p className="m-0 mb-2 text-faint text-[11.5px] leading-relaxed">
+            Powers distance-based matching on GroupBuy Opportunities. Find your coordinates by right-clicking your
+            spot on Google Maps and copying the numbers shown.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              type="number"
+              step="any"
+              placeholder="Latitude, e.g. -33.9249"
+              value={lat}
+              onChange={(e) => {
+                setLat(e.target.value);
+                setSaved(false);
+              }}
+            />
+            <TextField
+              type="number"
+              step="any"
+              placeholder="Longitude, e.g. 18.4241"
+              value={lng}
+              onChange={(e) => {
+                setLng(e.target.value);
+                setSaved(false);
+              }}
+            />
+          </div>
         </div>
         <div>
           <Label>Order & stock notes</Label>

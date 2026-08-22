@@ -12,6 +12,9 @@ export function useUpdateBuyerAccount() {
       businessName: string;
       businessType: Enums<"business_type">;
       orderNotes: string;
+      contactPhone: string;
+      lat: number | null;
+      lng: number | null;
     }) => {
       const { error } = await supabase
         .from("buyer_profiles")
@@ -19,6 +22,9 @@ export function useUpdateBuyerAccount() {
           business_name: args.businessName,
           business_type: args.businessType,
           order_notes: args.orderNotes,
+          contact_phone: args.contactPhone,
+          lat: args.lat,
+          lng: args.lng,
         })
         .eq("id", args.buyerId);
       if (error) throw error;

@@ -78,3 +78,41 @@ export interface Opportunity {
 export function fetchGroupOpportunities() {
   return invoke<{ opportunities: Opportunity[] }>("ai-group-opportunities", {});
 }
+
+export interface MatchedBuyer {
+  buyerId: string;
+  businessName: string;
+  businessType: string;
+  quantity: number;
+  distanceKm: number | null;
+}
+
+export interface MatchedItem {
+  itemId: string;
+  supplierId: string;
+  supplierName: string;
+  unit: string;
+  individualPrice: string;
+  groupPrice: string;
+  tierLabel: string;
+}
+
+export interface BuyerOpportunity {
+  requestId: string;
+  productName: string;
+  myQuantity: number;
+  unit: string;
+  matchedBuyers: MatchedBuyer[];
+  combinedQuantity: number;
+  matchedItem: MatchedItem | null;
+  canJoinDirectly: boolean;
+  isPoolAdmin: boolean;
+  savingsPerMe: number;
+  savingsTotal: number;
+  riskFlags: string[];
+  explanation: string;
+}
+
+export function fetchBuyerOpportunities() {
+  return invoke<{ opportunities: BuyerOpportunity[] }>("ai-buyer-opportunities", {});
+}

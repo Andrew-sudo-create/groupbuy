@@ -1,16 +1,38 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, Package, CreditCard, PiggyBank } from "lucide-react";
+import { ArrowLeft, Sparkles, Package, CreditCard, PiggyBank, CheckCircle2 } from "lucide-react";
 import { usePool } from "../hooks/usePools";
 import { useOrderSummary } from "../hooks/useOrderSummary";
+import { useAuth } from "../lib/AuthContext";
+import { useOrder, useStartOrder, useAdvanceOrderStatus, useSimulatePayment, ORDER_STATUS_SEQUENCE, type OrderStatus } from "../hooks/useOrders";
 import { generateOrderNarrative, AiError } from "../lib/ai";
 import { fmtR } from "../lib/domain";
-import { StatCard, Tag } from "../components/ui";
+import { StatCard, Tag, PrimaryButton, GhostButton } from "../components/ui";
+
+const STATUS_LABEL: Record<OrderStatus, string> = {
+  draft: "Draft",
+  pending_approval: "Pending approval",
+  group_forming: "Group forming",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
 
 export default function OrderSummaryDetailPage() {
   const { poolId, supplierId } = useParams<{ poolId: string; supplierId: string }>();
+  const { buyerProfile, supplierProfile } = useAuth();
   const { data: pool } = usePool(poolId);
   const { data: stats, isLoading } = useOrderSummary(poolId, supplierId);
+  const { data: order } = useOrder(poolId, supplierId);
+  const startOrder = useStartOrder();
+  const advance = useAdvanceOrderStatus();
+  const simulatePayment = useSimulatePayment();
+
+  const isPoolAdmin = !!buyerProfile && pool?.admin_buyer_id === buyerProfile.id;
+  const isThisSupplier = !!supplierProfile && supplierProfile.id === supplierId;
+  const canManageOrder = isPoolAdmin || isThisSupplier;
+  const currentUserId = buyerProfile?.id ?? supplierProfile?.id;
 
   const [narrative, setNarrative] = useState("");
   const [narrativeLoading, setNarrativeLoading] = useState(false);
@@ -73,6 +95,109 @@ export default function OrderSummaryDetailPage() {
           <StatCard dark icon={<Package size={13} />} label="Total units" value={String(stats?.totalUnits ?? 0)} />
           <StatCard dark icon={<CreditCard size={13} />} label="Total spend" value={fmtR(stats?.totalSpend ?? 0)} />
           <StatCard dark icon={<PiggyBank size={13} />} label="Total saved vs base" value={fmtR(stats?.totalSavings ?? 0)} />
+        </div>
+
+        <div className="bg-input border border-border rounded-xl p-4 sm:p-5 mb-7">
+          {!order ? (
+            <div className="flex justify-between items-center gap-3 flex-wrap">
+              <div>
+                <div className="text-sm font-semibold mb-0.5">No formal order yet</div>
+                <p className="m-0 text-muted text-[12.5px]">
+                  The numbers above are live and will keep changing as buyers adjust pledges. Start an order to lock
+                  in a snapshot and track it through fulfilment.
+                </p>
+              </div>
+              {canManageOrder && poolId && supplierId && currentUserId && (
+                <PrimaryButton
+                  onClick={() =>
+                    startOrder.mutate({
+                      poolId,
+                      supplierId,
+                      createdBy: currentUserId,
+                      totalUnits: stats?.totalUnits ?? 0,
+                      totalSpend: stats?.totalSpend ?? 0,
+                      totalSavings: stats?.totalSavings ?? 0,
+                    })
+                  }
+                  disabled={startOrder.isPending}
+                  className="whitespace-nowrap"
+                >
+                  {startOrder.isPending ? "Starting…" : "Start order"}
+                </PrimaryButton>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="flex justify-between items-start gap-3 flex-wrap mb-3.5">
+                <div>
+                  <div className="text-[11px] text-faint uppercase tracking-wide mb-1">Order status</div>
+                  <Tag tone={order.status === "cancelled" ? "neutral" : "accent"}>{STATUS_LABEL[order.status]}</Tag>
+                </div>
+                <div className="text-right">
+                  <div className="text-[11px] text-faint uppercase tracking-wide mb-1">Snapshot at start</div>
+                  <div className="text-[13px] text-text-soft">
+                    {order.total_units} units · {fmtR(order.total_spend)} · {fmtR(order.total_savings)} saved
+                  </div>
+                </div>
+              </div>
+
+              {canManageOrder && order.status !== "completed" && order.status !== "cancelled" && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {(() => {
+                    const idx = ORDER_STATUS_SEQUENCE.indexOf(order.status);
+                    const next = idx >= 0 && idx < ORDER_STATUS_SEQUENCE.length - 1 ? ORDER_STATUS_SEQUENCE[idx + 1] : null;
+                    return next && poolId && supplierId ? (
+                      <PrimaryButton
+                        onClick={() => advance.mutate({ orderId: order.id, status: next, poolId, supplierId })}
+                        disabled={advance.isPending}
+                      >
+                        Advance to {STATUS_LABEL[next]}
+                      </PrimaryButton>
+                    ) : null;
+                  })()}
+                  {poolId && supplierId && (
+                    <GhostButton
+                      onClick={() => advance.mutate({ orderId: order.id, status: "cancelled", poolId, supplierId })}
+                      disabled={advance.isPending}
+                    >
+                      Cancel order
+                    </GhostButton>
+                  )}
+                </div>
+              )}
+
+              {(order.status === "confirmed" || order.status === "processing" || order.status === "completed") && (
+                <div className="flex justify-between items-center gap-3 flex-wrap mt-3.5 pt-3.5 border-t border-border">
+                  <div className="text-[13px]">
+                    <div className="flex justify-between gap-4 text-text-soft mb-0.5">
+                      <span>Order total</span>
+                      <span>{fmtR(order.total_spend)}</span>
+                    </div>
+                    <div className="flex justify-between gap-4 text-faint text-[12px]">
+                      <span>Transaction fee (2%)</span>
+                      <span>{fmtR(order.transaction_fee)}</span>
+                    </div>
+                  </div>
+                  {order.payment_status === "simulated_paid" ? (
+                    <Tag>
+                      <span className="inline-flex items-center gap-1">
+                        <CheckCircle2 size={12} /> Paid (simulated)
+                      </span>
+                    </Tag>
+                  ) : canManageOrder && poolId && supplierId ? (
+                    <PrimaryButton
+                      onClick={() => simulatePayment.mutate({ orderId: order.id, poolId, supplierId })}
+                      disabled={simulatePayment.isPending}
+                    >
+                      Simulate payment
+                    </PrimaryButton>
+                  ) : (
+                    <Tag tone="neutral">Payment pending</Tag>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {isLoading && <p className="text-faint text-sm">Loading…</p>}

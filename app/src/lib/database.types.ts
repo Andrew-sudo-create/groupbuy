@@ -62,24 +62,33 @@ export type Database = {
         Row: {
           business_name: string
           business_type: Database["public"]["Enums"]["business_type"]
+          contact_phone: string
           created_at: string
           id: string
+          lat: number | null
+          lng: number | null
           order_notes: string
           pool_id: string | null
         }
         Insert: {
           business_name: string
           business_type: Database["public"]["Enums"]["business_type"]
+          contact_phone?: string
           created_at?: string
           id: string
+          lat?: number | null
+          lng?: number | null
           order_notes?: string
           pool_id?: string | null
         }
         Update: {
           business_name?: string
           business_type?: Database["public"]["Enums"]["business_type"]
+          contact_phone?: string
           created_at?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           order_notes?: string
           pool_id?: string | null
         }
@@ -175,6 +184,69 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          pool_id: string
+          status: Database["public"]["Enums"]["order_status"]
+          supplier_id: string
+          total_savings: number
+          total_spend: number
+          total_units: number
+          transaction_fee: number
+          updated_at: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pool_id: string
+          status?: Database["public"]["Enums"]["order_status"]
+          supplier_id: string
+          total_savings?: number
+          total_spend?: number
+          total_units?: number
+          transaction_fee?: number
+          updated_at?: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          pool_id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          supplier_id?: string
+          total_savings?: number
+          total_spend?: number
+          total_units?: number
+          transaction_fee?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "pools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pledges: {
         Row: {
           buyer_id: string
@@ -233,6 +305,8 @@ export type Database = {
           created_at: string
           delivery_location: string
           id: string
+          lat: number | null
+          lng: number | null
           name: string
           window_close_at: string
         }
@@ -241,6 +315,8 @@ export type Database = {
           created_at?: string
           delivery_location?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           name: string
           window_close_at?: string
         }
@@ -249,6 +325,8 @@ export type Database = {
           created_at?: string
           delivery_location?: string
           id?: string
+          lat?: number | null
+          lng?: number | null
           name?: string
           window_close_at?: string
         }
@@ -258,6 +336,111 @@ export type Database = {
             columns: ["admin_buyer_id"]
             isOneToOne: false
             referencedRelation: "buyer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_request_feedback: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          id: string
+          matched_buyer_ids: string[]
+          purchase_request_id: string
+          status: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          id?: string
+          matched_buyer_ids: string[]
+          purchase_request_id: string
+          status: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          matched_buyer_ids?: string[]
+          purchase_request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_request_feedback_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_request_feedback_purchase_request_id_fkey"
+            columns: ["purchase_request_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_requests: {
+        Row: {
+          budget_price: number | null
+          buyer_id: string
+          created_at: string
+          id: string
+          matched_item_id: string | null
+          needed_by: string | null
+          notes: string
+          product_name: string
+          quantity: number
+          radius_km: number | null
+          status: Database["public"]["Enums"]["purchase_request_status"]
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          budget_price?: number | null
+          buyer_id: string
+          created_at?: string
+          id?: string
+          matched_item_id?: string | null
+          needed_by?: string | null
+          notes?: string
+          product_name: string
+          quantity: number
+          radius_km?: number | null
+          status?: Database["public"]["Enums"]["purchase_request_status"]
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          budget_price?: number | null
+          buyer_id?: string
+          created_at?: string
+          id?: string
+          matched_item_id?: string | null
+          needed_by?: string | null
+          notes?: string
+          product_name?: string
+          quantity?: number
+          radius_km?: number | null
+          status?: Database["public"]["Enums"]["purchase_request_status"]
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_requests_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "buyer_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_requests_matched_item_id_fkey"
+            columns: ["matched_item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
             referencedColumns: ["id"]
           },
         ]
@@ -363,6 +546,10 @@ export type Database = {
     }
     Functions: {
       claim_next_demo_guest: { Args: never; Returns: string }
+      distance_km: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
+      }
       is_pool_admin: { Args: { p_pool_id: string }; Returns: boolean }
       is_supplier_active_in_pool: {
         Args: { p_pool_id: string }
@@ -372,8 +559,27 @@ export type Database = {
         Args: { p_item_id: string; p_pool_id: string }
         Returns: boolean
       }
+      matching_purchase_requests: {
+        Args: { p_buyer_id: string; p_product_name: string }
+        Returns: {
+          buyer_id: string
+          id: string
+          lat: number
+          lng: number
+          needed_by: string
+          pool_id: string
+          product_name: string
+          quantity: number
+          radius_km: number
+          unit: string
+        }[]
+      }
       my_pool_id: { Args: never; Returns: string }
       owns_item: { Args: { p_item_id: string }; Returns: boolean }
+      owns_supplier_profile: {
+        Args: { p_supplier_id: string }
+        Returns: boolean
+      }
       pool_item_totals: {
         Args: { p_pool_id: string }
         Returns: {
@@ -395,6 +601,16 @@ export type Database = {
       business_type: "Café" | "Bakery" | "Restaurant"
       link_initiator: "pool_admin" | "supplier"
       link_status: "pending" | "active" | "declined"
+      order_status:
+        | "draft"
+        | "pending_approval"
+        | "group_forming"
+        | "confirmed"
+        | "processing"
+        | "completed"
+        | "cancelled"
+      payment_status: "pending" | "simulated_paid"
+      purchase_request_status: "active" | "matched" | "fulfilled" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -525,6 +741,17 @@ export const Constants = {
       business_type: ["Café", "Bakery", "Restaurant"],
       link_initiator: ["pool_admin", "supplier"],
       link_status: ["pending", "active", "declined"],
+      order_status: [
+        "draft",
+        "pending_approval",
+        "group_forming",
+        "confirmed",
+        "processing",
+        "completed",
+        "cancelled",
+      ],
+      payment_status: ["pending", "simulated_paid"],
+      purchase_request_status: ["active", "matched", "fulfilled", "cancelled"],
     },
   },
 } as const
