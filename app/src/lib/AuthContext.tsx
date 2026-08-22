@@ -94,7 +94,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    // scope: "local" — supabase-js defaults signOut() to "global", which
+    // revokes EVERY session for that account, everywhere. Several accounts in
+    // this app (the demo supplier, guest buyers, other seeded fixtures) are
+    // deliberately shared across multiple concurrent testers/devices, so a
+    // global sign-out from one browser silently kicks everyone else off that
+    // same account too. Local scope only ends the session in this browser.
+    await supabase.auth.signOut({ scope: "local" });
   }, []);
 
   const role: AuthState["role"] = buyerProfile ? "buyer" : supplierProfile ? "supplier" : null;
