@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./components/AppLayout";
-import { RequireAuth, RequireRole, RequireAnyRole } from "./components/RouteGuards";
+import { RequireAuth, RequireRole, RequireAnyRole, RequireNoRole } from "./components/RouteGuards";
 import LoginPage from "./routes/LoginPage";
 import AuthCallbackPage from "./routes/AuthCallbackPage";
 import QuickJoinPage from "./routes/QuickJoinPage";
@@ -28,7 +28,9 @@ export default function App() {
           path="/onboarding/buyer"
           element={
             <RequireAuth>
-              <OnboardingBuyerPage />
+              <RequireNoRole>
+                <OnboardingBuyerPage />
+              </RequireNoRole>
             </RequireAuth>
           }
         />
@@ -36,7 +38,9 @@ export default function App() {
           path="/onboarding/supplier"
           element={
             <RequireAuth>
-              <OnboardingSupplierPage />
+              <RequireNoRole>
+                <OnboardingSupplierPage />
+              </RequireNoRole>
             </RequireAuth>
           }
         />

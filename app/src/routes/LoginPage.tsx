@@ -8,7 +8,7 @@ import { PrimaryButton, TextField, Label, PageKicker, ErrorNote } from "../compo
 const PENDING_ROLE_KEY = "groupbuy.pendingRole";
 
 export default function LoginPage() {
-  const { loading, profileLoading, user, role } = useAuth();
+  const { loading, profileLoading, user, role, buyerProfile, supplierProfile, signOut } = useAuth();
   const [chosenRole, setChosenRole] = useState<"buyer" | "supplier" | null>(null);
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -18,11 +18,48 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [switchingOut, setSwitchingOut] = useState(false);
+  const [autoRedirect, setAutoRedirect] = useState(true);
 
   if (!loading && user) {
     // Profile fetch is still in flight right after sign-in — role isn't known
     // yet, so don't guess (that would bounce a real buyer/supplier to onboarding).
     if (profileLoading) return null;
+
+    if (role && autoRedirect) {
+      // Already signed in — don't silently bounce them to their existing
+      // dashboard. Someone landing on /login on purpose almost always wants
+      // to switch accounts, and the old auto-redirect made that impossible
+      // without first hunting down "Log out" in the sidebar.
+      const name = role === "buyer" ? buyerProfile?.business_name : supplierProfile?.company_name;
+      return (
+        <div className="max-w-[440px] mx-auto px-6 py-16 text-center">
+          <PageKicker>Already signed in</PageKicker>
+          <h1 className="text-2xl font-bold mb-2">
+            You're in as {name} ({role})
+          </h1>
+          <p className="text-muted text-sm leading-relaxed mb-7">
+            Continue to your dashboard, or sign out to log in as a different business.
+          </p>
+          <div className="flex flex-col gap-3 items-center">
+            <PrimaryButton onClick={() => setAutoRedirect(false)} className="w-full max-w-[280px]">
+              Continue to dashboard
+            </PrimaryButton>
+            <button
+              onClick={async () => {
+                setSwitchingOut(true);
+                await signOut();
+                setSwitchingOut(false);
+              }}
+              disabled={switchingOut}
+              className="text-muted text-[13px] bg-transparent border-none cursor-pointer underline font-sans disabled:opacity-50"
+            >
+              {switchingOut ? "Signing out…" : "Sign in as someone else"}
+            </button>
+          </div>
+        </div>
+      );
+    }
     if (role === "buyer") return <Navigate to="/buyer" replace />;
     if (role === "supplier") return <Navigate to="/supplier" replace />;
     // Signed in but mid-onboarding — send them back to finish it.
