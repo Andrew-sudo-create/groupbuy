@@ -7,6 +7,8 @@ export interface PoolListItem {
   delivery_location: string;
   admin_buyer_id: string | null;
   window_close_at: string;
+  lat: number | null;
+  lng: number | null;
   buyerCount: number;
 }
 

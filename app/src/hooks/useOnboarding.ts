@@ -12,8 +12,10 @@ export function useCreateBuyerProfile() {
       businessType: Enums<"business_type">;
       poolChoice: string; // existing pool id, or "__new__"
       newPoolName?: string;
+      lat?: number | null;
+      lng?: number | null;
     }) => {
-      const { userId, businessName, businessType, poolChoice, newPoolName } = args;
+      const { userId, businessName, businessType, poolChoice, newPoolName, lat, lng } = args;
 
       if (poolChoice === "__new__") {
         const name = (newPoolName ?? "").trim();
@@ -24,12 +26,14 @@ export function useCreateBuyerProfile() {
           business_name: businessName,
           business_type: businessType,
           pool_id: null,
+          lat: lat ?? null,
+          lng: lng ?? null,
         });
         if (insertErr) throw insertErr;
 
         const { data: pool, error: poolErr } = await supabase
           .from("pools")
-          .insert({ name, admin_buyer_id: userId })
+          .insert({ name, admin_buyer_id: userId, lat: lat ?? null, lng: lng ?? null })
           .select()
           .single();
         if (poolErr) throw poolErr;
@@ -45,6 +49,8 @@ export function useCreateBuyerProfile() {
           business_name: businessName,
           business_type: businessType,
           pool_id: poolChoice,
+          lat: lat ?? null,
+          lng: lng ?? null,
         });
         if (error) throw error;
       }

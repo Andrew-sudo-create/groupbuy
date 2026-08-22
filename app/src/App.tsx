@@ -9,6 +9,7 @@ import OnboardingSupplierPage from "./routes/OnboardingSupplierPage";
 import BuyerDashboardPage from "./routes/BuyerDashboardPage";
 import MyPurchaseRequestsPage from "./routes/MyPurchaseRequestsPage";
 import BuyerOpportunitiesPage from "./routes/BuyerOpportunitiesPage";
+import NearbyBusinessesPage from "./routes/NearbyBusinessesPage";
 import MyPoolPage from "./routes/MyPoolPage";
 import MySummaryPage from "./routes/MySummaryPage";
 import SupplierPoolsGridPage from "./routes/SupplierPoolsGridPage";
@@ -69,6 +70,14 @@ export default function App() {
           element={
             <RequireRole role="buyer">
               <BuyerOpportunitiesPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/buyer/nearby"
+          element={
+            <RequireRole role="buyer">
+              <NearbyBusinessesPage />
             </RequireRole>
           }
         />

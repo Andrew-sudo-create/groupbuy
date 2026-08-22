@@ -14,6 +14,7 @@ import {
   X,
   Sparkles,
   ClipboardList,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "../lib/AuthContext";
 
@@ -98,6 +99,9 @@ export function Sidebar({ open = false, onClose }: { open?: boolean; onClose?: (
               </NavLink>
               <NavLink to="/buyer/opportunities" icon={<Sparkles size={16} />} onNavigate={onClose}>
                 GroupBuy Opportunities
+              </NavLink>
+              <NavLink to="/buyer/nearby" icon={<MapPin size={16} />} onNavigate={onClose}>
+                Nearby Businesses
               </NavLink>
               <NavLink to="/buyer/pool" icon={<Users size={16} />} onNavigate={onClose}>
                 My Pool

@@ -120,6 +120,17 @@ export function computeSummaryStats(
   return { perItem: items, perBuyer, totalUnits, totalSpend, totalSavings: totalBase - totalSpend };
 }
 
+/** Great-circle distance in km between two lat/lng points (Haversine). */
+export function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
 export function formatCountdown(closeAt: string | Date, now: number): string {
   const remaining = Math.max(0, new Date(closeAt).getTime() - now);
   const s = Math.floor(remaining / 1000);
